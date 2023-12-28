@@ -1,0 +1,16 @@
+@import "../../../styles/Variable.scss";
+
+.Toastify__toast--success {
+  .Toastify__toast-body::before {
+    content: "";
+    display: inline-block;
+    margin-right: 10px;
+    width: 4px;
+    height: 58px;
+    border-radius: 50px;
+    background-color: $Approved;
+  }
+  .Toastify__progress-bar--success {
+    background-color: $Approved;
+  }
+}

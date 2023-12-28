@@ -1,0 +1,67 @@
+@import"Mixins.scss";
+
+// Color Variables
+$Black: #000000;
+$White: #ffffff;
+$Font_Primary: #141414;
+$Placeholder_Text: #141414;
+$Blue_Primary: #e45017;
+$Accent: #D9D9D9;
+$Btn_thame1: #FF512F;
+$Btn_thame2: #DD2476;
+$Border_black: #000000;
+$Border: #141414;
+$Border_light: #BFBFBF;
+$Border_light_focus: #8C8C8C;
+$Menu-borader:rgba(255, 255, 255, 0.66);
+$Menu-bg0:rgba(255, 182, 182, 0.41);
+$Menu-bg1:rgba(228, 216, 216, 0.22);
+$Error: #F03D50;
+$Black4:#F0F0F0;
+$success:#00A300;
+
+// Font stacks
+$font_family_jost: 'Jost', sans-serif;
+$font_size_base: 22px;
+
+// Custom Scrollbar Mixins
+@mixin scrollbar {
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color:$Btn_thame2;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+    border-radius: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background:$Accent;
+    border-radius: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color:$Error;
+    border-radius: 6px;
+    border: 0px solid $White;
+  }
+}
+
+// SCREEN SIZES AND BREAKPOINTS
+$screen-xs-min: 480px !default; // Extra-small screen / phone
+$screen-sm-min: 768px !default; // Small screen / tablet
+$screen-md-min: 1025px !default; // Medium screen / desktop
+$screen-lg-min: 1366px !default; // Large screen / wide desktop
+$screen-xl-min: 1600px !default; // Large screen devices
+$screen-xxl-min: 1800px !default; // Large screen devices
+
+// Provide a maximum so media queries do not overlap when required
+$screen-xxs-max: ($screen-xs-min - 1) !default; // Below from 479px
+$screen-xs-max: ($screen-sm-min - 1) !default; // Below from 767px
+$screen-sm-max: ($screen-md-min - 1) !default; // Below from 1024px
+$screen-991: (991px) !default; // Below from 991px
+$screen-md-max: ($screen-lg-min - 1) !default; // Below from 1365px
+$screen-1199: (1199px) !default; // Below from 1199px
+$screen-lg-max: ($screen-xl-min - 1) !default; // Below from 1599px
+$screen-xl-max: 1800px !default; // Below from 1799px

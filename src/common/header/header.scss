@@ -1,0 +1,230 @@
+@import "../../styles/Variable.scss";
+
+.header-sec {
+    padding: 40px 0;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 999;
+    transition: all 0.6s;
+
+    &.onscroll {
+        @media screen and (max-width:$screen-991) {
+            background: rgb(255 255 255 / 84%);
+            box-shadow: 0 2px 12px $Menu-bg0;
+            padding: 10px 0;
+        }
+    }
+
+    @media screen and (max-width:$screen-1199) {
+        padding: 30px 0;
+    }
+
+    @media screen and (max-width:$screen-sm-max) {
+        padding: 15px 0;
+        position: fixed;
+    }
+
+    .custom-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo-block-left {
+        width: 40%;
+
+        @media screen and (max-width:$screen-sm-max) {
+            width: 50%;
+        }
+
+        a {
+            display: block;
+            max-width: 322px;
+
+            @media screen and (max-width:$screen-1199) {
+                max-width: 250px;
+            }
+
+            img {
+                width: 100%;
+                display: block;
+
+                &.blacklogo {
+                    display: none;
+                }
+            }
+        }
+    }
+
+    .menu-block-right {
+        width: 60%;
+        position: relative;
+
+        @media screen and (max-width:$screen-sm-max) {
+            width: 50%;
+            ;
+        }
+    }
+
+    .home-burger-menu {
+        cursor: pointer;
+        width: 173px;
+        margin: auto;
+        margin-right: 0;
+        border-radius: 60px;
+        border: 1px solid $Menu-borader;
+        background: linear-gradient(95deg, rgba(255, 255, 255, 0.41) 0%, rgba(255, 255, 255, 0.22) 100%);
+        position: relative;
+        z-index: 9;
+
+        @media screen and (max-width:$screen-sm-max) {
+            width: 120px;
+        }
+
+        &>div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 54px;
+
+            @media screen and (max-width:$screen-sm-max) {
+                height: 36px;
+            }
+        }
+
+        .homeburger-title {
+            font-size: 18px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 150%;
+            letter-spacing: 2.34px;
+            margin-right: 14px;
+            margin-top: 2px;
+            color: $White;
+
+            @media screen and (max-width:$screen-sm-max) {
+                font-size: 14px;
+                margin-right: 8px;
+            }
+        }
+
+        .homeburger-line {
+            width: 44px;
+
+            @media screen and (max-width:$screen-sm-max) {
+                width: 30px;
+            }
+        }
+
+        .line {
+            width: 44px;
+            height: 2px;
+            background-color: #ecf0f1;
+            display: block;
+            margin: 8px auto;
+            -webkit-transition: all 0.5s ease-in-out;
+            -o-transition: all 0.5s ease-in-out;
+            transition: all 0.5s ease-in-out;
+            margin-right: 0;
+
+            @media screen and (max-width:$screen-sm-max) {
+                width: 30px;
+            }
+
+            &:nth-child(2) {
+                width: 26px;
+
+                @media screen and (max-width:$screen-sm-max) {
+                    width: 15px;
+                }
+            }
+        }
+
+        .is-active {
+            .line {
+                &:nth-child(2) {
+                    width: 44px;
+
+                    @media screen and (max-width:$screen-sm-max) {
+                        width: 30px;
+                    }
+                }
+
+                &:nth-child(1) {
+                    width: 26px;
+
+                    @media screen and (max-width:$screen-sm-max) {
+                        width: 15px;
+                    }
+                }
+            }
+        }
+    }
+    .munu-block {
+        width: 100%;
+        max-width: 170px;
+        position: absolute;
+        background: linear-gradient(95deg, rgba(255, 182, 182, 0.41) 0%, rgb(248 224 224 / 52%) 100%);
+        right: 0;
+        border-radius: 5px;
+        height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(-15px);
+        transition: all 0.5s;
+    
+         ul {
+            padding: 10px 20px;
+            li {
+                display:block;
+                .menu-link {
+                    color: $Font_Primary;
+                    transition: all 0.5s;
+                    cursor: pointer;
+                    &:hover {
+                        color: $Btn_thame1;
+                    }
+                }
+            }
+         }
+         &.active {
+            overflow: visible;
+            opacity: 1;
+            height: auto;
+            transform: translateY(0px);
+         }
+    }
+
+
+    &.header-bk {
+        .logo-block-left {
+            a {
+                img {
+                    &.whitelogo {
+                        display: none;
+                    }
+
+                    &.blacklogo {
+                        display: block;
+                    }
+                }
+            }
+        }
+
+        .home-burger-menu {
+            border: 1px solid $Menu-borader;
+            background: linear-gradient(95deg, $Menu-bg0 0%, $Menu-bg1 100%);
+
+            .homeburger-title {
+                color: $Black;
+            }
+
+            .line {
+                background-color: $Black;
+            }
+        }
+    }
+}
