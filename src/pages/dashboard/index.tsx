@@ -1,17 +1,27 @@
-// create dashboard page component
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
+import "./dashboard.scss";
+import Header from "../../common/header";
+import MyLeads from "../myleads";
+import SidebarMenu from "../sidebarmenu";
 
 const Dashboard = () => {
   return (
-    <div className="container">
-      <div className="row">
-        <div className="col-12 text-center">
-          <h1>Dashboard</h1>
-          <Link to="/">Go Home</Link>
+    <>
+      <Header />
+      <section className="dashboard">
+        <div className="custom-row">
+          <div className="left-sidebar">
+            <SidebarMenu />
+          </div>
+          <div className="content-right-block">
+            <div className="content-wrap">
+              <MyLeads />
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </>
   );
 };
 

@@ -1,13 +1,13 @@
-import { VolumeMute } from "./collection/VolumeMute";
-import { VolumeOn } from "./collection/VolumeOn";
-import { Buyericon } from "./collection/Buyericon";
-import { Sellericon } from "./collection/Sellericon";
+import { EyehideIcon } from "./collection/EyehideIcon";
+import { EyeIcon } from "./collection/EyeIcon";
+import { DeleteIcon } from "./collection/DeleteIcon";
+import { UsersIcon } from "./collection/UsersIcon";
 import { Googleicon } from "./collection/Googleicon";
-import { Condoicon } from "./collection/Condoicon";
-import { Propertyicon } from "./collection/Propertyicon";
-import { Familyicon } from "./collection/Familyicon";
-import { Landfieldicon } from "./collection/Landfieldicon";
-import { Industrialicon } from "./collection/Industrialicon";
+import { EditIcon } from "./collection/EditIcon";
+import { LeadsIcon } from "./collection/LeadsIcon";
+import { ExportdataIcon } from "./collection/ExportdataIcon";
+import { SendIcon } from "./collection/SendIcon";
+import { AgentsIcon } from "./collection/AgentsIcon";
 import { Closeicon } from "./collection/Closeicon";
 import { RightIcon } from "./collection/RightIcon";
 import { ChooseIcon } from "./collection/ChooseIcon";
@@ -16,16 +16,16 @@ import { ChatbotIcon} from "./collection/ChatbotIcon"
 
 
 export {
-  VolumeMute as VolumeMute,
-  VolumeOn as VolumeOn,
-  Buyericon as Buyericon,
-  Sellericon as Sellericon,
+  EyehideIcon as EyehideIcon,
+  EyeIcon as EyeIcon,
+  DeleteIcon as DeleteIcon,
+  UsersIcon as UsersIcon,
   Googleicon as Googleicon,
-  Condoicon as Condoicon,
-  Propertyicon as Propertyicon,
-  Familyicon as Familyicon,
-  Landfieldicon as Landfieldicon,
-  Industrialicon as Industrialicon,
+  EditIcon as EditIcon,
+  LeadsIcon as LeadsIcon,
+  ExportdataIcon as ExportdataIcon,
+  SendIcon as SendIcon,
+  AgentsIcon as AgentsIcon,
   Closeicon as Closeicon,
   RightIcon as RightIcon,
   ChooseIcon as ChooseIcon,

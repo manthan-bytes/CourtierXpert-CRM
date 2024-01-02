@@ -36,6 +36,7 @@ ul,
 li {
   margin: 0;
   padding: 0;
+  list-style: none;
 }
 
 header,
@@ -110,17 +111,22 @@ img {
   height: 100vh;
   position: relative;
   padding: 120px 0 90px 0;
-  opacity: 0; /* Set initial opacity to 0 */
-  animation: fadeIn 1s ease-in-out forwards; 
+  opacity: 0;
+  /* Set initial opacity to 0 */
+  animation: fadeIn 1s ease-in-out forwards;
 
   @keyframes fadeIn {
     from {
-      opacity: 0; /* Start with opacity 0 */
+      opacity: 0;
+      /* Start with opacity 0 */
     }
+
     to {
-      opacity: 1; /* End with opacity 1 */
+      opacity: 1;
+      /* End with opacity 1 */
     }
   }
+
   @media screen and (max-width:$screen-991) {
     height: 100%;
     min-height: 100vh;
@@ -184,63 +190,10 @@ img {
   }
 }
 
-.form-step-contect {
-  text-align: center;
-
-  .form-inner-block {
-    display: flex;
-    justify-content: center;
-    gap: 48px;
-    padding: 24px 0;
-
-    @media screen and (max-width: $screen-lg-max) {
-      padding: 15px 0;
-      gap: 35px;
-    }
-
-    @media screen and (max-width:$screen-1199) {
-      padding: 15px 0;
-      gap: 30px;
-    }
-
-    @media screen and (max-width:$screen-xs-max) {
-      padding: 0px 0 25px 0;
-      gap: 15px;
-    }
-  }
-
-  .grdnt_btn {
-    margin-top: 24px;
-  }
-
-  .sub-tilte {
-    font-size: 16px;
-    font-style: normal;
-    @include font-weight(400);
-    line-height: 150%;
-    margin-bottom: 24px;
-
-    span {
-      background: linear-gradient(90deg, $Btn_thame1 0%, $Btn_thame2 100%);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      @include font-weight(700);
-    }
-  }
-}
-
 .property-select {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 24px;
-  padding-bottom: 24px;
-
-  @media screen and (max-width:$screen-1199) {
-    gap: 15px;
-    padding-bottom: 20px;
-  }
 
   li {
     display: inline;
@@ -251,6 +204,9 @@ img {
   color: $Error;
   font-size: 12px;
   line-height: 125%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
 }
 
 
@@ -259,7 +215,7 @@ img {
   right: 0;
   bottom: 10px;
   padding: 5px;
-  background:$Error;
+  background: $Error;
   font-size: 13px;
   line-height: 120%;
   border-bottom-left-radius: 5px;
@@ -270,23 +226,320 @@ img {
   overflow: hidden;
   z-index: 999;
   color: $White;
+
   &.error-msg {
     background: $Error;
     transform: translateX(0%);
   }
+
   &.success-msg {
-    background:$success;
+    background: $success;
     transform: translateX(0%);
   }
 }
 
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.datatable-main {
+  .p-datatable-table {
+    @media screen and (max-width:$screen-lg-max) {
+      width: 1440px;
+    }
   }
 
-  to {
-    transform: rotate(360deg);
+  thead {
+    >tr {
+      >th {
+        background: $Black-black-3;
+        font-size: 14px;
+        line-height: 125%;
+        @include font-weight(500);
+        color: $Black-9;
+        padding-top: 15px;
+        padding-bottom: 15px;
+        border: none;
+
+        &.p-selection-column {
+          padding: 1rem 2px;
+
+          .p-column-header-content {
+            display: none;
+          }
+
+          @media screen and (max-width:$screen-xl-max) {
+            padding: 1rem 0.5rem;
+          }
+        }
+      }
+    }
+  }
+
+  tbody {
+    >tr {
+      background: transparent;
+
+      >td {
+        font-size: 14px;
+        line-height: 125%;
+        @include font-weight(400);
+        color: $Font_Primary;
+        border: solid 1px $Accent;
+        border-width: 0 0 1px 0;
+
+        @media screen and (max-width:$screen-xl-max) {
+          padding: 1rem 0.5rem;
+        }
+
+        .p-tag {
+          padding: 6px 7px;
+          border-radius: 8px;
+          color: $Black;
+          font-weight: 400;
+        }
+
+        .btn-tb {
+          padding: 0;
+          border: none;
+          border-radius: 0;
+          margin-right: 8px;
+          box-shadow: none;
+
+          &:last-child {
+            margin-right: 0px;
+          }
+        }
+
+        .p-column-filter button {
+          background: transparent;
+          color: $Font_Primary;
+        }
+
+        &.select-tb {
+          padding-left: 0;
+          padding-right: 0px;
+          width: auto;
+
+          .p-checkbox-box {
+            box-shadow: none;
+            outline: none;
+            border-color: $Border_light;
+            background: transparent;
+          }
+
+          .p-highlight {
+
+            background-image: linear-gradient(90deg, $Btn_thame2, $Btn_thame1);
+            // color: $White;
+            // background-position: 100% 0;
+            border-color: $Btn_thame1;
+          }
+        }
+      }
+    }
+  }
+
+  .p-paginator-bottom {
+    margin-top: 46px;
+    border-bottom: none;
+
+    .p-paginator-pages {
+      .p-paginator-page {
+        padding: 8px 10px;
+        min-width: inherit;
+        height: auto;
+        border-radius: 8px;
+        color: $Black;
+        min-width: 32px;
+
+        &.p-highlight {
+          background: $Black-black-3;
+        }
+      }
+
+    }
+
+    .p-link {
+      padding: 8px 10px;
+      min-width: inherit;
+      height: auto;
+      border-radius: 8px;
+      color: $Black;
+
+      &.p-highlight {
+        background: $Black-black-3;
+      }
+    }
+
+    .p-paginator-current {
+      margin-left: 50px;
+      color: $Border_light_focus;
+    }
+
+    .p-dropdown {
+      display: flex;
+      align-items: center;
+      padding: 8px 10px;
+      height: auto;
+      border: 1px solid $Accent;
+      box-shadow: none;
+    }
+
+    .p-dropdown-trigger {
+      margin-left: 8px;
+      width: 16px;
+    }
+  }
+}
+
+.p-dropdown-items-wrapper {
+  .p-dropdown-items {
+    border-radius: 5px;
+    overflow: hidden;
+
+    .p-dropdown-item {
+      padding: 5px 10px;
+
+      &.p-highlight {
+        background: $Black-black-3;
+        color: $Black;
+      }
+    }
+  }
+}
+
+.p-dialog-footer {
+  .theme_btn {
+    box-shadow: none;
+  }
+}
+
+.new-table-add {
+  padding: 8px 27px;
+  border: 1px solid $Accent;
+  border-left: 0px;
+  border-right: 0px;
+  border-radius: 0;
+  background: transparent;
+  position: relative;
+  bottom: 111px;
+
+  button {
+    font-size: 14px;
+    line-height: 125%;
+    background: transparent;
+    border: none;
+    border-radius: 0px;
+    color: $Font_Primary;
+    padding: 0;
+    display: block;
+    cursor: pointer;
+    box-shadow: none;
+
+    span {
+      @include font-weight(400);
+
+    }
+  }
+}
+
+.undecided {
+  background: $Undecided ;
+}
+
+.transferred {
+  background: $Transferred;
+}
+
+.canceled {
+  background: $Canceled;
+}
+
+.completed {
+  background: $Completed;
+}
+
+.inactive {
+  background: $Inactive;
+}
+
+.contractsigned {
+  background: $ContractSigned;
+}
+
+
+.p-column-filter-overlay-menu {
+  .p-dropdown {
+    padding: 10px 10px;
+    box-shadow: none;
+
+    &.p-focus {
+      border: 1px solid $Border_light_focus;
+    }
+
+    &:hover {
+      border: 1px solid $Border_light_focus;
+    }
+
+    .p-dropdown-trigger {
+      width: auto;
+    }
+  }
+
+  .p-column-filter-constraint {
+    padding-bottom: 12px;
+    padding-top: 12px;
+  }
+
+  .p-column-filter-add-rule {
+    padding-top: 0;
+    padding-bottom: 0;
+
+    .p-column-filter-add-button {
+      color: $Font_Primary;
+      box-shadow: none;
+
+      &:hover {
+        background: $Black-black-3;
+      }
+
+      .p-button-label {
+        padding-left: 10px;
+      }
+    }
+  }
+
+  .p-column-filter-buttonbar {
+
+    .p-button-sm {
+      color: $White;
+      border: solid 1px $Black-black-10;
+      background: $Black-black-10;
+      box-shadow: none;
+
+      &:hover {
+        color: $Font_Primary;
+        background: $White;
+      }
+
+      &.p-button-outlined {
+        color: $Font_Primary;
+        border: solid 1px $Black-black-10;
+        background: $White;
+
+        &:hover {
+          color: $White;
+          background: $Black-black-10;
+        }
+      }
+    }
+  }
+}
+
+.p-connected-overlay-enter-done {
+  .p-dropdown-items-wrapper {
+    .p-dropdown-items {
+      span.p-tag.p-component {
+        padding: 3px 5px;
+      }
+    }
   }
 }

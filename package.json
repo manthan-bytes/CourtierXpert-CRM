@@ -2,7 +2,7 @@
   "name": "courtierxpert-crm",
   "version": "1.0.0",
   "private": true,
- "author": {
+  "author": {
     "name": "Manthan Patel",
     "email": "manthan.patel@bytestechnolab.com"
   },
@@ -20,6 +20,7 @@
     "axios": "^1.6.2",
     "css-loader": "^6.8.1",
     "node-sass": "^7.0.3",
+    "primereact": "^10.2.1",
     "react": "^18.2.0",
     "react-chatbot-kit": "^2.2.2",
     "react-dom": "^18.2.0",

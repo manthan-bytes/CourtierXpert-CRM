@@ -1,0 +1,33 @@
+@import "../../styles/Variable.scss";
+
+.sidebar-menu {
+    li {
+        + li {
+            margin-top: 24px;
+        }
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            transition: all 0.4s;
+            padding: 8px 24px;
+            border-radius: 16px;
+            font-size: 18px;
+            @include font-weight(600);
+            line-height: 150%;
+            color: $Font_Primary;
+
+            &.active {
+                background: $Black-black-3;
+            }
+
+            &:hover {
+                background: $Black-black-3;
+            }
+
+            span {
+                display: inline-flex;
+            }
+        }
+    }
+}
