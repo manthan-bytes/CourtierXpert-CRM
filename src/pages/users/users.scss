@@ -1,0 +1,121 @@
+@import "../../styles/Variable.scss";
+.edit-popup-user {
+    .field-main {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        .field{
+            width: calc(50% - 10px);
+            .label-form {
+                margin-bottom: 5px;
+                display: block;
+                color: $Font_Primary;
+            }
+            .form-control {
+                height: 50px;
+                padding: 6px 14px 6px 14px;
+            }
+        }
+    }
+    .p-dialog-content {
+        overflow-y: visible;
+    }
+    .select-main-wrap {
+        width: 100%;
+        .css-1u9des2-indicatorSeparator {
+            display: none;
+        }
+        .css-tj5bde-Svg {
+            color: $Placeholder_Text;
+        }
+        .css-1fdsijx-ValueContainer {
+            padding: 0;
+        }
+        .css-13cymwt-control {
+            border-radius: 8px;
+            border: 1px solid $Border_light;
+            background: $White;
+            font-size: 16px;
+            font-style: normal;
+            line-height: 150%;
+            color: $Font_Primary;
+            @include font-weight(400);
+            height: 50px;
+            box-shadow: none;
+            outline: none;
+            padding: 6px 5px 6px 14px;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            &:focus {
+                border-color: $Border_light_focus;
+            }
+        }
+        .css-t3ipsp-control {
+            border-radius: 8px;
+            border: 1px solid $Border_light;
+            background: $White;
+            font-size: 16px;
+            font-style: normal;
+            line-height: 150%;
+            color: $Font_Primary;
+            @include font-weight(400);
+            height: 50px;
+            box-shadow: none;
+            outline: none;
+            padding: 6px 5px 6px 14px;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            &:focus {
+                border-color: $Border_light_focus;
+            }
+        }
+        .css-1nmdiq5-menu {
+            top:45px;
+            z-index: 9;
+            position: absolute;
+            > div {
+                display: block;
+                overflow: auto;
+                scrollbar-width: thin;
+                scrollbar-color:$Black;
+                max-height: 210px;
+                &::-webkit-scrollbar {
+                  width: 4px;
+                  height: 4px;
+                  border-radius: 6px;
+                }
+              
+                &::-webkit-scrollbar-track {
+                  background:$Accent;
+                  border-radius: 5px;
+                }
+              
+                &::-webkit-scrollbar-thumb {
+                  background-color:$Black;
+                  border-radius: 6px;
+                  border: 0px solid $White;
+                }
+                > div {
+                    cursor: pointer;
+                    font-size: 16px;
+                    line-height: 125%;
+                    @include font-weight(400);
+                    transition: all .3s ease-in-out;
+                    padding: 7px 15px;
+                    color: $Black !important;
+                    display:block;
+                    width: auto;
+                    height: auto;
+                    background: transparent;
+                    &:hover {
+                       
+                        background: #F5F5F5;
+                    }
+                }
+            }
+        }
+        
+    }
+}

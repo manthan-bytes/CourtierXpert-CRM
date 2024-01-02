@@ -8,34 +8,29 @@ import Login from "../pages/auth/Login";
 import Home from "../pages/home";
 import { ROUTES } from "../core/constants/routes";
 import MyLeads from "../pages/myleads";
+import Users from "../pages/users";
 
 const AppRouting = () => {
   return (
     <Routes>
       {/* Private route start */}
-      <Route path="/">
+      {/* <Route path="/">
         <Route path={ROUTES.HOME} index element={<Home />} />
 
         <Route path="/" element={<Navigate to="/home" />} />
-      </Route>
-
+      </Route> */}
       <Route path="/" element={<PublicLayout />}>
         <Route path={ROUTES.LOGIN} index element={<Login />} />
-        <Route path={ROUTES.DASHBOARD} index element={<Dashboard />} />
-        <Route path={ROUTES.MYLEADS} index element={<MyLeads />} />
       </Route>
 
-      {/* <Route path="/home"> */}
-      {/* </Route> */}
+      <Route path="/" element={<PrivateLayout />}>
+        <Route path={ROUTES.DASHBOARD} index element={<Dashboard />} />
 
-      {/* Private route end */}
-
-      {/* Public route start */}
-      {/* <Route path="/" element={<PublicLayout />}>
-        <Route path="/" index element={<Login />} />
-        <Route path="/login" element={<Login />} />
-      </Route> */}
-      {/* Public route end */}
+        <Route path={ROUTES.DASHBOARD}>
+          <Route path={ROUTES.MYLEADS} index element={<MyLeads />} />
+          <Route path={ROUTES.USERS} index element={<Users />} />
+        </Route>
+      </Route>
 
       {/* Not found route start */}
       <Route path="*" element={<NotFound />} />
