@@ -556,7 +556,7 @@ const Users = () => {
       </div>
       <section>
         <DataTable
-          className="datatable-main"
+          className="datatable-main user-datatable"
           ref={dt}
           value={getUsers}
           selection={selectedProducts}
@@ -578,30 +578,30 @@ const Users = () => {
             field="name"
             header="Name"
             sortable
-            style={{ width: "13%" }}
+            style={{ width: "30%" }}
           ></Column>
           <Column
             field="email"
             header="Email"
             className="emaildiv"
-            style={{ width: "13%" }}
+            style={{ width: "31%" }}
           ></Column>
           <Column
             field="phone"
             header="Phone No"
-            style={{ width: "12%" }}
+            style={{ width: "19%" }}
           ></Column>
           <Column
             field="role"
             header="Role"
-            style={{ width: "4%" }}
+            style={{ width: "14%" }}
           ></Column>
          
           <Column
             header="Actions"
             body={actionBodyTemplate}
             exportable={false}
-            style={{ width: "3%" }}
+            style={{ width: "6%" }}
           ></Column>
         </DataTable>
         {/* <Toolbar className="new-table-add" left={leftToolbarTemplate}></Toolbar> */}

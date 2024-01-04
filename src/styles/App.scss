@@ -257,7 +257,10 @@ img {
         padding-top: 15px;
         padding-bottom: 15px;
         border: none;
-
+        @media screen and (max-width:$screen-xl-max) {
+          padding-left: 0.5rem;
+          padding-right: 0.5rem;
+        }
         &.p-selection-column {
           padding: 1rem 2px;
 
@@ -338,7 +341,7 @@ img {
   }
 
   .p-paginator-bottom {
-    margin-top: 46px;
+    margin-top: 10px;
     border-bottom: none;
 
     .p-paginator-pages {

@@ -652,27 +652,28 @@ const MyLeads = () => {
             field="userId.email"
             header="Email"
             className="emaildiv"
-            style={{ width: "13%" }}
+            style={{ width: "18%" }}
           ></Column>
           <Column
             field="userId.phone"
             header="Phone No"
-            style={{ width: "12%" }}
+            style={{ width: "10%" }}
           ></Column>
           <Column
             field="leadType"
             header="Lead Type"
-            style={{ width: "4%" }}
+            style={{ width: "8%" }}
           ></Column>
           <Column
             field="city"
             header="City"
-            style={{ width: "12%" }}
+            style={{ width: "20%" }}
+
           ></Column>
           <Column
             field="boroughs"
             header="Borough"
-            style={{ width: "16%" }}
+            style={{ width: "13%" }}
           ></Column>
           <Column
             field="propertyType"

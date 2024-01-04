@@ -16,7 +16,7 @@
             @include font-weight(600);
             line-height: 150%;
             color: $Font_Primary;
-
+            cursor: pointer;
             &.active {
                 background: $Black-black-3;
             }

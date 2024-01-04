@@ -106,12 +106,19 @@ const Header = () => {
           <div className="menu-block-right">
             <div className="login-user-dateils">
               <div className="user-icon-btn">
-                <img src={userimg} alt="user icon" width="48" height="48"/> 
+                <img src={userimg} alt="user icon" width="48" height="48" />
               </div>
               <div className="use-name">
                 <strong>Ravi kushwah</strong>
                 <span>Admin</span>
               </div>
+            </div>
+            <div className="active munu-block">
+              <ul>
+                <li>
+                  <div className="menu-link">Logout</div>
+                </li>
+              </ul>
             </div>
           </div>
         </div>

@@ -94,6 +94,37 @@
                 }
             }
         }
+        .munu-block {
+            background:$White;
+            border-radius: 5px;
+            height: 0;
+            max-width: 150px;
+            opacity: 0;
+            overflow: hidden;
+            position: absolute;
+            right: 0;
+            transform: translateY(-15px);
+            transition: all .5s;
+            width: 100%;
+            box-shadow: #8f8d8d5e 0 1px 7px;
+            &.active {
+                height: auto;
+                opacity: 1;
+                overflow: visible;
+                transform: translateY(0);
+            }
+            ul {
+                padding: 10px 20px;
+                li {
+                    display: block;
+                    .menu-link {
+                        color: #141414;
+                        cursor: pointer;
+                        transition: all .5s;
+                    }
+                }
+            }
+        }
     }
 
 }
