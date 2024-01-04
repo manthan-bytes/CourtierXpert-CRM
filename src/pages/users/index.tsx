@@ -1,6 +1,6 @@
 // create dashboard page component
-import React, { useRef, useState } from "react";
-import "./users.scss";
+import React, { useEffect, useRef, useState } from "react";
+import "./user.scss";
 import {
   SendIcon,
   ExportdataIcon,
@@ -9,7 +9,6 @@ import {
   RightIcon,
 } from "../../core/icons";
 import { DataTable } from "primereact/datatable";
-import { Toast } from "primereact/toast";
 import { Column } from "primereact/column";
 import { Tag } from "primereact/tag";
 import { Button } from "primereact/button";
@@ -21,6 +20,14 @@ import { classNames } from "primereact/utils";
 import { Toolbar } from "primereact/toolbar";
 import Select from "react-select";
 import { Dropdown } from "primereact/dropdown";
+import { getAllLeads } from "../service/lead.service";
+import { LEAD_TYPE, PROPERTY_TYPE } from "../../core/constants/constants";
+import { CITIES } from "../../core/constants/cities";
+import { NEWCITIES } from "../../core/constants/listOfCities";
+import * as FileSaver from "file-saver";
+import * as XLSX from "sheetjs-style";
+import { deleteUser, getAllUsers } from "../service/login.service";
+import { ToastContainer, toast } from "react-toastify";
 
 interface Product {
   id: string | null;
@@ -36,6 +43,18 @@ interface Product {
   agent: string;
   quantity: number;
   inventoryStatus: string;
+}
+
+interface User {
+  id: number;
+  email: string;
+  name: string;
+  phone: string;
+  password: null | string;
+  role: string;
+  resetPasswordToken: null | string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const Users = () => {
@@ -55,108 +74,115 @@ const Users = () => {
     quantity: 0,
     inventoryStatus: "INSTOCK",
   };
-
-  const [products, setProducts] = useState<any>([
-    {
-      id: "1000",
-      code: "f230fh0g3",
-      name: "Bamboo Watch",
-      email: "binhan628@gmail.com",
-      phone: "(505) 555-0125",
-      role: "Seller",
-      city: "Quebec, Saguenay",
-      borough: "Côte-des-Neiges–Notre-Dame-de-Grâce",
-      property: "Single Family",
-      description: "Product Description",
-      agent: "K Watson",
-      quantity: 24,
-      inventoryStatus: "INSTOCK",
-    },
-    {
-      id: "1001",
-      code: "nvklal433",
-      name: "Black Watch",
-      email: "trungkienspktnd@gamail.com",
-      phone: "(505) 555-0125",
-      role: "Seller",
-      city: "Quebec, Saguenay",
-      borough: "Côte-des-Neiges–Notre-Dame-de-Grâce",
-      property: "Single Family",
-      description: "Product Description",
-      agent: "K",
-      quantity: 61,
-      inventoryStatus: "INSTOCK",
-    },
-    {
-      id: "1002",
-      code: "zz21cz3c1",
-      name: "Blue Band",
-      phone: "(505) 555-0125",
-      role: "Seller",
-      city: "Quebec, Saguenay",
-      borough: "Côte-des-Neiges–Notre-Dame-de-Grâce",
-      property: "Single Family",
-      description: "Product Description",
-      agent: "Watson",
-      quantity: 2,
-      inventoryStatus: "LOWSTOCK",
-    },
-    {
-      id: "1001",
-      code: "nvklal433",
-      name: "Black Watch",
-      email: "trungkienspktnd@gamail.com",
-      phone: "(505) 555-0125",
-      role: "Seller",
-      city: "Quebec, Saguenay",
-      borough: "Côte-des-Neiges–Notre-Dame-de-Grâce",
-      property: "Single Family",
-      description: "Product Description",
-      agent: "K",
-      quantity: 61,
-      inventoryStatus: "INSTOCK",
-    },
-    {
-      id: "1002",
-      code: "zz21cz3c1",
-      name: "Blue Band",
-      phone: "(505) 555-0125",
-      role: "Seller",
-      city: "Quebec, Saguenay",
-      borough: "Côte-des-Neiges–Notre-Dame-de-Grâce",
-      property: "Single Family",
-      description: "Product Description",
-      agent: "Watson",
-      quantity: 2,
-      inventoryStatus: "LOWSTOCK",
-    },
-    {
-      id: "1001",
-      code: "nvklal433",
-      name: "Black Watch",
-      email: "trungkienspktnd@gamail.com",
-      phone: "(505) 555-0125",
-      role: "Seller",
-      city: "Quebec, Saguenay",
-      borough: "Côte-des-Neiges–Notre-Dame-de-Grâce",
-      property: "Single Family",
-      description: "Product Description",
-      agent: "K",
-      quantity: 61,
-      inventoryStatus: "INSTOCK",
-    },
-  ]);
-  const [productDialog, setProductDialog] = useState<boolean>(false);
+  const city: any = CITIES;
+  const [getBoroughs, setBoroughs] = useState<any>();
+  const [getUsers, setUsers] = useState<any>([]);
+  // const [products, setProducts] = useState<any>([
+  //   {
+  //     id: "1000",
+  //     code: "f230fh0g3",
+  //     name: "Bamboo Watch",
+  //     email: "binhan628@gmail.com",
+  //     phone: "(505) 555-0125",
+  //     role: "Seller",
+  //     city: "Quebec, Saguenay",
+  //     borough: "Côte-des-Neiges–Notre-Dame-de-Grâce",
+  //     property: "Single Family",
+  //     description: "Product Description",
+  //     agent: "K Watson",
+  //     quantity: 24,
+  //     inventoryStatus: "INSTOCK",
+  //   },
+  //   {
+  //     id: "1001",
+  //     code: "nvklal433",
+  //     name: "Black Watch",
+  //     email: "trungkienspktnd@gamail.com",
+  //     phone: "(505) 555-0125",
+  //     role: "Seller",
+  //     city: "Quebec, Saguenay",
+  //     borough: "Côte-des-Neiges–Notre-Dame-de-Grâce",
+  //     property: "Single Family",
+  //     description: "Product Description",
+  //     agent: "K",
+  //     quantity: 61,
+  //     inventoryStatus: "INSTOCK",
+  //   },
+  //   {
+  //     id: "1002",
+  //     code: "zz21cz3c1",
+  //     name: "Blue Band",
+  //     phone: "(505) 555-0125",
+  //     role: "Seller",
+  //     city: "Quebec, Saguenay",
+  //     borough: "Côte-des-Neiges–Notre-Dame-de-Grâce",
+  //     property: "Single Family",
+  //     description: "Product Description",
+  //     agent: "Watson",
+  //     quantity: 2,
+  //     inventoryStatus: "LOWSTOCK",
+  //   },
+  //   {
+  //     id: "1001",
+  //     code: "nvklal433",
+  //     name: "Black Watch",
+  //     email: "trungkienspktnd@gamail.com",
+  //     phone: "(505) 555-0125",
+  //     role: "Seller",
+  //     city: "Quebec, Saguenay",
+  //     borough: "Côte-des-Neiges–Notre-Dame-de-Grâce",
+  //     property: "Single Family",
+  //     description: "Product Description",
+  //     agent: "K",
+  //     quantity: 61,
+  //     inventoryStatus: "INSTOCK",
+  //   },
+  //   {
+  //     id: "1002",
+  //     code: "zz21cz3c1",
+  //     name: "Blue Band",
+  //     phone: "(505) 555-0125",
+  //     role: "Seller",
+  //     city: "Quebec, Saguenay",
+  //     borough: "Côte-des-Neiges–Notre-Dame-de-Grâce",
+  //     property: "Single Family",
+  //     description: "Product Description",
+  //     agent: "Watson",
+  //     quantity: 2,
+  //     inventoryStatus: "LOWSTOCK",
+  //   },
+  //   {
+  //     id: "1001",
+  //     code: "nvklal433",
+  //     name: "Black Watch",
+  //     email: "trungkienspktnd@gamail.com",
+  //     phone: "(505) 555-0125",
+  //     role: "Seller",
+  //     city: "Quebec, Saguenay",
+  //     borough: "Côte-des-Neiges–Notre-Dame-de-Grâce",
+  //     property: "Single Family",
+  //     description: "Product Description",
+  //     agent: "K",
+  //     quantity: 61,
+  //     inventoryStatus: "INSTOCK",
+  //   },
+  // ]);
+  const [leadDialog, setLeadDialog] = useState<boolean>(false);
+  // const [productDialog, setProductDialog] = useState<boolean>(false);
   const [deleteProductDialog, setDeleteProductDialog] =
     useState<boolean>(false);
   const [deleteProductsDialog, setDeleteProductsDialog] =
     useState<boolean>(false);
-  const [product, setProduct] = useState<Product>(emptyProduct);
+  const [product, setProduct] = useState<Product>();
+  const [getUser, setUser] = useState<User>();
+
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [globalFilter, setGlobalFilter] = useState<string>("");
-  const toast = useRef<Toast>(null);
   const dt = useRef<DataTable<Product[]>>(null);
+  const [locationOptions, setLocationOption] = useState<any>([]);
+  const [isSelectOpen, setIsSelectOpen] = useState(false);
+
   const [statuses] = useState([
     "Undecided",
     "Transferred",
@@ -165,45 +191,83 @@ const Users = () => {
     "Inactive",
     "Contract Signed",
   ]);
-
-  // const getSeverity = (status: any) => {
-  //   switch (status) {
-  //     case "unqualified":
-  //       return "danger";
-
-  //     case "qualified":
-  //       return "success";
-
-  //     case "new":
-  //       return "info";
-
-  //     case "negotiation":
-  //       return "warning";
-
-  //     case "renewal":
-  //       return null;
-  //   }
-  // };
-  // useEffect(() => {
-  //   // ProductService.getProducts().then((data) => setProducts(data));
-  // }, []);
-
-  const formatCurrency = (value: number) => {
-    return value.toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
-    });
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const fileExtension = ".xlsx";
+  const handleOnChangeLocation = async (selectedValue: any) => {
+    // const data = [...locationOptions];
+    const city = selectedValue.value;
+    const selectedCityDate: any = NEWCITIES.find(
+      (o: any) => o.city.value === selectedValue.value
+    );
+    setBoroughs(selectedCityDate.boroughs);
   };
+
+  const handleMenuOpen = () => {
+    setIsSelectOpen(true);
+  };
+
+  const handleMenuClose = () => {
+    setIsSelectOpen(false);
+  };
+
+  const handleOnLeadTypeChange = (selectedValue: any) => {
+    const leadData: any = { ...getUser };
+    leadData.leadType = selectedValue.value;
+    setUser(leadData);
+  };
+
+  const handleDownload = () => {
+    const excelData: any = [];
+
+    getUsers.forEach((element: User, i: number) => {
+    
+
+      const obj = {
+        No: i + 1,
+        Name: element.name,
+        Email: element.email,
+        Phone: element.phone,
+        Role: element.role
+       
+      };
+      excelData.push(obj);
+    });
+   
+      const ws = XLSX.utils.json_to_sheet(excelData);
+      const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+      const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+      const data = new Blob([excelBuffer], { type: fileType });
+      FileSaver.saveAs(data, "test" + fileExtension);
+
+  };
+
+  useEffect(() => {
+    const leadObj = {
+      page: 1,
+      limit: 50,
+    };
+    const leads = getAllUsers(leadObj)
+      .then((res) => {
+        if (res.statusCode === 200) {
+         
+          setUsers(res.data.result);
+        }
+      })
+      .catch((err) => {
+        console.log("🚀 ~ file: index.tsx:179 ~ leads ~ err:", err);
+      });
+  }, []);
 
   const openNew = () => {
     setProduct(emptyProduct);
     setSubmitted(false);
-    setProductDialog(true);
+    setLeadDialog(true);
   };
 
   const hideDialog = () => {
     setSubmitted(false);
-    setProductDialog(false);
+    setLeadDialog(false);
   };
 
   const hideDeleteProductDialog = () => {
@@ -215,76 +279,71 @@ const Users = () => {
   };
 
   const saveProduct = () => {
-    setSubmitted(true);
-
-    if (product.name.trim()) {
-      let _products = [...products];
-      let _product = { ...product };
-
-      if (product.id) {
-        const index = findIndexById(product.id);
-
-        _products[index] = _product;
-        toast.current?.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Product Updated",
-          life: 3000,
-        });
-      } else {
-        _product.id = createId();
-        _products.push(_product);
-        toast.current?.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Product Created",
-          life: 3000,
-        });
-      }
-
-      setProducts(_products);
-      setProductDialog(false);
-      setProduct(emptyProduct);
-    }
+    // setSubmitted(true);
+    // if (product.name.trim()) {
+    //   let _products = [...products];
+    //   let _product = { ...product };
+    //   if (product.id) {
+    //     const index = findIndexById(product.id);
+    //     _products[index] = _product;
+    //     toast.current?.show({
+    //       severity: "success",
+    //       summary: "Successful",
+    //       detail: "Product Updated",
+    //       life: 3000,
+    //     });
+    //   } else {
+    //     _product.id = createId();
+    //     _products.push(_product);
+    //     toast.current?.show({
+    //       severity: "success",
+    //       summary: "Successful",
+    //       detail: "Product Created",
+    //       life: 3000,
+    //     });
+    //   }
+    //   setProducts(_products);
+    //   setProductDialog(false);
+    //   setProduct(emptyProduct);
+    // }
   };
 
-  const editProduct = (product: Product) => {
-    setProduct({ ...product });
-    setProductDialog(true);
+  const editProduct = (user: User) => {
+    setUser({ ...user });
+    setLeadDialog(true);
   };
 
-  const confirmDeleteProduct = (product: Product) => {
-    setProduct(product);
-    setDeleteProductDialog(true);
+  const confirmDeleteProduct = (lead: User) => {
+    setUser(lead);
+    // setDeleteProductDialog(true);
   };
 
   const deleteProduct = () => {
-    let _products = products.filter(
-      (val: { id: string | null }) => val.id !== product.id
-    );
+    // let _products = products.filter(
+    //   (val: { id: string | null }) => val.id !== product.id
+    // );
 
-    setProducts(_products);
+    // setProducts(_products);
+    deleteUser(getUser?.id).then((res) => {
+    console.log("🚀 ~ file: index.tsx:328 ~ deleteUser ~ res:", res)
     setDeleteProductDialog(false);
-    setProduct(emptyProduct);
-    toast.current?.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "Product Deleted",
-      life: 3000,
-    });
-  };
-
-  const findIndexById = (id: string) => {
-    let index = -1;
-
-    for (let i = 0; i < products.length; i++) {
-      if (products[i].id === id) {
-        index = i;
-        break;
-      }
-    }
-
-    return index;
+    toast.success(res.message, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      
+    }).catch((err) => {
+      toast.error(err.message, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    })
+   
+    // setProduct(emptyProduct);
+    // toast.current?.show({
+    //   severity: "success",
+    //   summary: "Successful",
+    //   detail: "Product Deleted",
+    //   life: 3000,
+    // });
   };
 
   const createId = (): string => {
@@ -300,42 +359,38 @@ const Users = () => {
   };
 
   const deleteSelectedProducts = () => {
-    let _products = products.filter(
-      (val: Product) => !selectedProducts.includes(val)
-    );
+    // let _products = products.filter(
+    //   (val: Product) => !selectedProducts.includes(val)
+    // );
 
-    setProducts(_products);
-    setDeleteProductsDialog(false);
-    setSelectedProducts([]);
-    toast.current?.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "Products Deleted",
-      life: 3000,
-    });
+    // setProducts(_products);
+    // setDeleteProductsDialog(false);
+    // setSelectedProducts([]);
+    // toast.current?.show({
+    //   severity: "success",
+    //   summary: "Successful",
+    //   detail: "Products Deleted",
+    //   life: 3000,
+    // });
   };
 
   const onInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     name: string
   ) => {
-    const val = (e.target && e.target.value) || "";
-    let _product = { ...product };
-
-    // @ts-ignore
-    _product[`${name}`] = val;
-
-    setProduct(_product);
+    // const val = (e.target && e.target.value) || "";
+    // let _product = { ...product };
+    // // @ts-ignore
+    // _product[`${name}`] = val;
+    // setProduct(_product);
   };
 
   const onInputNumberChange = (e: InputNumberChangeEvent, name: string) => {
-    const val = e.value || 0;
-    let _product = { ...product };
-
-    // @ts-ignore
-    _product[`${name}`] = val;
-
-    setProduct(_product);
+    // const val = e.value || 0;
+    // let _product = { ...product };
+    // // @ts-ignore
+    // _product[`${name}`] = val;
+    // setProduct(_product);
   };
 
   const leftToolbarTemplate = () => {
@@ -360,10 +415,10 @@ const Users = () => {
     );
   };
 
-  const actionBodyTemplate = (rowData: Product) => {
+  const actionBodyTemplate = (rowData: User) => {
     return (
       <React.Fragment>
-        <Button
+        {/* <Button
           icon="pi pi-pencil"
           rounded
           outlined
@@ -371,7 +426,7 @@ const Users = () => {
           onClick={() => editProduct(rowData)}
         >
           <EditIcon />
-        </Button>
+        </Button> */}
         <Button
           icon="pi pi-trash"
           rounded
@@ -407,7 +462,7 @@ const Users = () => {
         return null;
     }
   };
-  const productDialogFooter = (
+  const leadtDialogFooter = (
     <React.Fragment>
       <Button
         label="Cancel"
@@ -482,6 +537,7 @@ const Users = () => {
   const statusItemTemplate = (option: any) => {
     return <Tag value={option} severity={getSeverity(option)} />;
   };
+
   return (
     <>
       <div className="common-main-header">
@@ -489,10 +545,10 @@ const Users = () => {
           <h2 className="h2">My Leads</h2>
         </div>
         <div className="right-btn-block">
-          <button className="theme_btn">
+          {/* <button className="theme_btn">
             <SendIcon /> Send to Agents
-          </button>
-          <button className="theme_btn balck_btn">
+          </button> */}
+          <button className="theme_btn balck_btn" onClick={handleDownload}>
             <ExportdataIcon />
             Export Data
           </button>
@@ -502,7 +558,7 @@ const Users = () => {
         <DataTable
           className="datatable-main"
           ref={dt}
-          value={products}
+          value={getUsers}
           selection={selectedProducts}
           onSelectionChange={(e) => {
             if (Array.isArray(e.value)) {
@@ -517,17 +573,7 @@ const Users = () => {
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
           // globalFilter={globalFilter}
         >
-          <Column
-            selectionMode="multiple"
-            exportable={false}
-            className="select-tb"
-          ></Column>
-          <Column
-            field="code"
-            header="Code"
-            sortable
-            style={{ width: "5%" }}
-          ></Column>
+    
           <Column
             field="name"
             header="Name"
@@ -542,37 +588,15 @@ const Users = () => {
           ></Column>
           <Column
             field="phone"
-            header="Phone"
+            header="Phone No"
             style={{ width: "12%" }}
           ></Column>
-          <Column field="role" header="Role" style={{ width: "4%" }}></Column>
-          <Column field="city" header="City" style={{ width: "12%" }}></Column>
           <Column
-            field="borough"
-            header="Borough"
-            style={{ width: "16%" }}
+            field="role"
+            header="Role"
+            style={{ width: "4%" }}
           ></Column>
-          <Column
-            field="property"
-            header="Property"
-            style={{ width: "12%" }}
-          ></Column>
-
-          <Column
-            field="agent"
-            header="Agent"
-            sortable
-            style={{ width: "10%" }}
-          ></Column>
-          <Column
-            field="inventoryStatus"
-            header="Status"
-            body={statusBodyTemplate}
-            style={{ width: "15%" }}
-            filterMenuStyle={{ width: "14rem" }}
-            filter
-            filterElement={statusFilterTemplate}
-          ></Column>
+         
           <Column
             header="Actions"
             body={actionBodyTemplate}
@@ -580,58 +604,72 @@ const Users = () => {
             style={{ width: "3%" }}
           ></Column>
         </DataTable>
-        <Toolbar className="new-table-add" left={leftToolbarTemplate}></Toolbar>
+        {/* <Toolbar className="new-table-add" left={leftToolbarTemplate}></Toolbar> */}
       </section>
 
       <Dialog
-        visible={productDialog}
+        visible={leadDialog}
         style={{ width: "42rem" }}
         breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        header="Product Details"
+        header="Lead Details"
         modal
         className="edit-popup-user"
-        footer={productDialogFooter}
+        footer={leadtDialogFooter}
         onHide={hideDialog}
       >
         <div className="field-main">
           <div className="field">
             <label className="label-form" htmlFor="Role">
-              Role
+              Lead Type
             </label>
 
-            <Select className="select-main-wrap" options={options} />
-            {submitted && !product.name && (
+            {/* <Select
+              className="select-main-wrap"
+              options={LEAD_TYPE}
+              value={LEAD_TYPE.find(
+                (option) => option.value === getLead?.leadType
+              )}
+              onChange={(e) => handleOnLeadTypeChange(e)}
+            /> */}
+            {/* {submitted && !product.name && (
               <small className="p-error">Name is required.</small>
-            )}
+            )} */}
           </div>
           <div className="field">
             <label className="label-form" htmlFor="City">
               City
             </label>
 
-            <Select className="select-main-wrap" options={options} />
-            {submitted && !product.name && (
+            {/* <Select
+              className="select-main-wrap"
+              options={city}
+              onChange={(e) => handleOnChangeLocation(e)}
+              onMenuOpen={handleMenuOpen}
+              onMenuClose={handleMenuClose}
+            /> */}
+            {/* {submitted && !product.name && (
               <small className="p-error">Name is required.</small>
-            )}
+            )} */}
+          </div>
+          <div className="field">
+            {/* <label className="label-form" htmlFor="name">
+              Borough
+            </label>
+            <Select className="select-main-wrap" options={getBoroughs} /> */}
+            {/* {submitted && !product.name && (
+              <small className="p-error">Name is required.</small>
+            )}  */}
           </div>
           <div className="field">
             <label className="label-form" htmlFor="name">
-              Name
+              Property Type
             </label>
-
-            <InputText
-              id="name"
-              value={product.name}
-              onChange={(e) => onInputChange(e, "name")}
-              required
-              autoFocus
-              className="form-control"
-            />
-            {submitted && !product.name && (
+            <Select className="select-main-wrap" options={PROPERTY_TYPE} />
+            {/* {submitted && !product.name && (
               <small className="p-error">Name is required.</small>
-            )}
+            )}  */}
           </div>
-          <div className="field"></div>
+          {/* <div className="field"></div>
           <div className="field">
             <label className="label-form" htmlFor="name">
               Name
@@ -646,12 +684,12 @@ const Users = () => {
                   <span>Remember</span>
                 </label>
               </li>
-            </ul>
+            </ul> */}
 
-            {submitted && !product.name && (
+          {/* {submitted && !product.name && (
               <small className="p-error">Name is required.</small>
-            )}
-          </div>
+            )} */}
+          {/* </div> */}
         </div>
       </Dialog>
 
@@ -692,7 +730,7 @@ const Users = () => {
             style={{ fontSize: "2rem" }}
           />
           {product && (
-            <span>Are you sure you want to delete the selected products?</span>
+            <span>Are you sure you want to delete the selected user?</span>
           )}
         </div>
       </Dialog>

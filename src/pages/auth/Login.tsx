@@ -1,29 +1,47 @@
 // create login page component
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { login } from "../../store/features/AuthSlice";
+// import { login } from "../../store/features/AuthSlice";
 import { useAppDispatch } from "../../store/store";
 import ButtonSubmit from "../../components/Button/ButtonSubmit";
 import "./Login.scss";
 import { RightIcon, EyehideIcon, EyeIcon } from "../../core/icons";
 import loginbg from "../../assets/images/login.jpg";
 import logoblack from "../../assets/images/logo-black.svg";
+import { login } from "../service/login.service";
+import { ToastContainer, toast } from "react-toastify";
 
 const Login = () => {
   // state for email and password
-  const [username, setUsername] = useState<string>("kminchelle");
-  const [password, setPassword] = useState<string>("0lelplR");
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   // submit handler
-  const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    dispatch(login({ username: username, password: password }))
+  const submitHandler = async () => {
+    // e.preventDefault();
+    const element: any = document.getElementById("submit");
+    if (element) {
+      element.classList.add("loader-btn");
+    }
+    await login({ email: username, password: password })
       .then((response: any) => {
-        localStorage.setItem("token", response.payload.token);
-        navigate("/dashboard");
+        if (response.statusCode === 200) {
+          localStorage.setItem("token", response.data.access_token);
+          toast.success(response.message, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+          navigate("/dashboard");
+        } else {
+          toast.error(response.message, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+        }
+        
+        // localStorage.setItem("token", response.data.data.access_token);
+        // navigate("/dashboard");
       })
       .catch((err: any) => {
         console.log("Login submit err", err);
@@ -52,7 +70,7 @@ const Login = () => {
             </Link>
           </div>
           <div className="form-wrap">
-            <form onSubmit={submitHandler}>
+            <form>
               <h1 className="h1">Welcome Back!</h1>
               <p>Kindly enter your details to continue with us!</p>
               <div className="form-inner-block">
@@ -65,7 +83,7 @@ const Login = () => {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                   />
-                  <span className="error-msg">Contact Number is required</span>
+                  {/* <span className="error-msg">Contact Number is required</span> */}
                 </div>
                 <div className="form-group">
                   <div className="eye_icon">
@@ -82,10 +100,10 @@ const Login = () => {
                       type="button"
                       onClick={handleTogglePassword}
                     >
-                      {showPassword ? <EyehideIcon /> : <EyeIcon />}
+                      {/* {showPassword ? <EyehideIcon /> : <EyeIcon />} */}
                     </button>
                   </div>
-                  <span className="error-msg">Contact Number is required</span>
+                  {/* <span className="error-msg">Contact Number is required</span> */}
                 </div>
 
                 <div className="form-bottom-bock">
@@ -105,12 +123,12 @@ const Login = () => {
                   </Link>
                 </div>
               </div>
-              <div className="theme_btn grdnt_btn">Login</div>
+              <div className="theme_btn grdnt_btn" onClick={submitHandler} id="submit">Login</div>
               {/* <ButtonSubmit title="Login" disabled={false} /> */}
             </form>
           </div>
 
-          <div className="form-wrap forget-pswd">
+          {/* <div className="form-wrap forget-pswd">
             <form onSubmit={submitHandler}>
               <h1 className="h1">Forget Password</h1>
               <div className="form-inner-block">
@@ -132,9 +150,8 @@ const Login = () => {
                 </div>
               </div>
               <div className="theme_btn grdnt_btn">Submit</div>
-              {/* <ButtonSubmit title="Login" disabled={false} /> */}
             </form>
-          </div>
+          </div> */}
         </div>
         <div className="right-block-img">
           <img src={loginbg} alt="" />

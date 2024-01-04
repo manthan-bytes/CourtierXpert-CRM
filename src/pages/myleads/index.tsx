@@ -1,5 +1,5 @@
 // create dashboard page component
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./myleads.scss";
 import {
   SendIcon,
@@ -21,7 +21,12 @@ import { classNames } from "primereact/utils";
 import { Toolbar } from "primereact/toolbar";
 import Select from "react-select";
 import { Dropdown } from "primereact/dropdown";
-
+import { getAllLeads } from "../service/lead.service";
+import { LEAD_TYPE, PROPERTY_TYPE } from "../../core/constants/constants";
+import { CITIES } from "../../core/constants/cities";
+import { NEWCITIES } from "../../core/constants/listOfCities";
+import * as FileSaver from "file-saver";
+import * as XLSX from "sheetjs-style";
 interface Product {
   id: string | null;
   code: string;
@@ -36,6 +41,42 @@ interface Product {
   agent: string;
   quantity: number;
   inventoryStatus: string;
+}
+
+interface Lead {
+  id: number;
+  leadType: "seller" | "buyer"; // Choose appropriate types
+  propertyType: "single_family" | "multi_family" | "commercial"; // Choose appropriate types
+  propertyImage: string | null;
+  propertySaleTime: string;
+  propertyPurchaseTime: string | null;
+  preferences: {
+    isPool: "yes" | "no";
+    bedrooms: string;
+    isGarage: "yes" | "no";
+    landArea: string;
+    bathrooms: string;
+    homeStyle: string;
+    builtInYear: string;
+    buildingType: string;
+    isIntegration: "yes" | "no";
+  };
+  location: any ; // Change this to the appropriate type if there's location information
+  city:any;
+  boroughs:any;
+  createdAt: string;
+  updatedAt: string;
+  userId: {
+    id: number;
+    email: string;
+    name: string;
+    phone: string;
+    password: string | null; // Change this to the appropriate type
+    role: "user";
+    resetPasswordToken: string | null; // Change this to the appropriate type
+    createdAt: string;
+    updatedAt: string;
+  };
 }
 
 const MyLeads = () => {
@@ -55,7 +96,9 @@ const MyLeads = () => {
     quantity: 0,
     inventoryStatus: "INSTOCK",
   };
-
+  const city: any = CITIES;
+  const [getBoroughs, setBoroughs] = useState<any>();
+  const [getLeads, setLeads] = useState<any>([]);
   const [products, setProducts] = useState<any>([
     {
       id: "1000",
@@ -146,17 +189,23 @@ const MyLeads = () => {
       inventoryStatus: "INSTOCK",
     },
   ]);
-  const [productDialog, setProductDialog] = useState<boolean>(false);
+  const [leadDialog, setLeadDialog] = useState<boolean>(false);
+  // const [productDialog, setProductDialog] = useState<boolean>(false);
   const [deleteProductDialog, setDeleteProductDialog] =
     useState<boolean>(false);
   const [deleteProductsDialog, setDeleteProductsDialog] =
     useState<boolean>(false);
-  const [product, setProduct] = useState<Product>(emptyProduct);
+  const [product, setProduct] = useState<Product>();
+  const [getLead, setLead] = useState<Lead>();
+
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [globalFilter, setGlobalFilter] = useState<string>("");
   const toast = useRef<Toast>(null);
   const dt = useRef<DataTable<Product[]>>(null);
+  const [locationOptions, setLocationOption] = useState<any>([]);
+  const [isSelectOpen, setIsSelectOpen] = useState(false);
+
   const [statuses] = useState([
     "Undecided",
     "Transferred",
@@ -165,45 +214,122 @@ const MyLeads = () => {
     "Inactive",
     "Contract Signed",
   ]);
-
-  // const getSeverity = (status: any) => {
-  //   switch (status) {
-  //     case "unqualified":
-  //       return "danger";
-
-  //     case "qualified":
-  //       return "success";
-
-  //     case "new":
-  //       return "info";
-
-  //     case "negotiation":
-  //       return "warning";
-
-  //     case "renewal":
-  //       return null;
-  //   }
-  // };
-  // useEffect(() => {
-  //   // ProductService.getProducts().then((data) => setProducts(data));
-  // }, []);
-
-  const formatCurrency = (value: number) => {
-    return value.toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
-    });
+  const fileType =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+  const fileExtension = ".xlsx";
+  const handleOnChangeLocation = async (selectedValue: any) => {
+    // const data = [...locationOptions];
+    const city = selectedValue.value;
+    const selectedCityDate: any = NEWCITIES.find(
+      (o: any) => o.city.value === selectedValue.value
+    );
+    setBoroughs(selectedCityDate.boroughs);
   };
+
+  const handleMenuOpen = () => {
+    setIsSelectOpen(true);
+  };
+
+  const handleMenuClose = () => {
+    setIsSelectOpen(false);
+  };
+
+  const handleOnLeadTypeChange = (selectedValue: any) => {
+    const leadData: any = { ...getLead };
+    leadData.leadType = selectedValue.value;
+    setLead(leadData);
+  };
+
+  const handleDownload = () => {
+    const excelData: any = [];
+
+    getLeads.forEach((element: Lead, i: number) => {
+      const location = JSON.parse(element.location);
+      let locationCity: any = [];
+      let locationBoroughs: any = [];
+      if (location) {
+
+        location.forEach((location: any) => {
+          const city = location.city;
+          const borough = location.boroughs;
+          locationCity.push(city);
+          locationBoroughs.push(borough);
+        });
+      }
+
+      const obj = {
+        No: i + 1,
+        Name: element.userId.name,
+        Email: element.userId.email,
+        Phone: element.userId.phone,
+        LeadType: element.leadType,
+        PropertyType: element.propertyType,
+        PropertySaleTime: element.propertySaleTime,
+        PropertyPurchaseTime: element.propertyPurchaseTime,
+        PropertyImages: element.propertyImage,
+        City: locationCity.join(', '), // Join multiple cities into a string
+        Boroughs: locationBoroughs.join(', '), // Join multiple boroughs into a string
+      };
+      const preferences = element.preferences;
+      const mergeObj = { ...obj, ...preferences };
+
+      excelData.push(mergeObj);
+    });
+   
+    setTimeout(() => {
+      const ws = XLSX.utils.json_to_sheet(excelData);
+      const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+      const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+      const data = new Blob([excelBuffer], { type: fileType });
+      FileSaver.saveAs(data, "test" + fileExtension);
+    },1000)
+
+  };
+
+  useEffect(() => {
+    const leadObj = {
+      page: 1,
+      limit: 10,
+    };
+    const leads = getAllLeads(leadObj)
+      .then((res) => {
+        if (res.statusCode === 200) {
+          res.data.result.forEach((data:Lead) => {
+            const locations = JSON.parse(data.location);
+            let locationCity: any = [];
+          let locationBoroughs: any = [];
+          if (locations) {
+            locations.forEach((location: any) => {
+              const city = location.city;
+              const borough = location.boroughs;
+              locationCity.push(city);
+              locationBoroughs.push(borough);
+            });
+          }
+
+
+          data['city'] = locationCity.join(', ');
+
+          data['boroughs'] = locationBoroughs.join(', ');
+          })
+          console.log("🚀 ~ file: index.tsx:327 ~ .then ~ res.data.result:", res.data.result)
+          setLeads(res.data.result);
+        }
+      })
+      .catch((err) => {
+        console.log("🚀 ~ file: index.tsx:179 ~ leads ~ err:", err);
+      });
+  }, []);
 
   const openNew = () => {
     setProduct(emptyProduct);
     setSubmitted(false);
-    setProductDialog(true);
+    setLeadDialog(true);
   };
 
   const hideDialog = () => {
     setSubmitted(false);
-    setProductDialog(false);
+    setLeadDialog(false);
   };
 
   const hideDeleteProductDialog = () => {
@@ -215,55 +341,52 @@ const MyLeads = () => {
   };
 
   const saveProduct = () => {
-    setSubmitted(true);
-
-    if (product.name.trim()) {
-      let _products = [...products];
-      let _product = { ...product };
-
-      if (product.id) {
-        const index = findIndexById(product.id);
-
-        _products[index] = _product;
-        toast.current?.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Product Updated",
-          life: 3000,
-        });
-      } else {
-        _product.id = createId();
-        _products.push(_product);
-        toast.current?.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Product Created",
-          life: 3000,
-        });
-      }
-
-      setProducts(_products);
-      setProductDialog(false);
-      setProduct(emptyProduct);
-    }
+    // setSubmitted(true);
+    // if (product.name.trim()) {
+    //   let _products = [...products];
+    //   let _product = { ...product };
+    //   if (product.id) {
+    //     const index = findIndexById(product.id);
+    //     _products[index] = _product;
+    //     toast.current?.show({
+    //       severity: "success",
+    //       summary: "Successful",
+    //       detail: "Product Updated",
+    //       life: 3000,
+    //     });
+    //   } else {
+    //     _product.id = createId();
+    //     _products.push(_product);
+    //     toast.current?.show({
+    //       severity: "success",
+    //       summary: "Successful",
+    //       detail: "Product Created",
+    //       life: 3000,
+    //     });
+    //   }
+    //   setProducts(_products);
+    //   setProductDialog(false);
+    //   setProduct(emptyProduct);
+    // }
   };
 
-  const editProduct = (product: Product) => {
-    setProduct({ ...product });
-    setProductDialog(true);
+  const editProduct = (lead: Lead) => {
+    console.log("🚀 ~ file: index.tsx:281 ~ editProduct ~ lead:", lead);
+    setLead({ ...lead });
+    setLeadDialog(true);
   };
 
-  const confirmDeleteProduct = (product: Product) => {
-    setProduct(product);
-    setDeleteProductDialog(true);
+  const confirmDeleteProduct = (product: Lead) => {
+    setLead(product);
+    // setDeleteProductDialog(true);
   };
 
   const deleteProduct = () => {
-    let _products = products.filter(
-      (val: { id: string | null }) => val.id !== product.id
-    );
+    // let _products = products.filter(
+    //   (val: { id: string | null }) => val.id !== product.id
+    // );
 
-    setProducts(_products);
+    // setProducts(_products);
     setDeleteProductDialog(false);
     setProduct(emptyProduct);
     toast.current?.show({
@@ -319,23 +442,19 @@ const MyLeads = () => {
     e: React.ChangeEvent<HTMLInputElement>,
     name: string
   ) => {
-    const val = (e.target && e.target.value) || "";
-    let _product = { ...product };
-
-    // @ts-ignore
-    _product[`${name}`] = val;
-
-    setProduct(_product);
+    // const val = (e.target && e.target.value) || "";
+    // let _product = { ...product };
+    // // @ts-ignore
+    // _product[`${name}`] = val;
+    // setProduct(_product);
   };
 
   const onInputNumberChange = (e: InputNumberChangeEvent, name: string) => {
-    const val = e.value || 0;
-    let _product = { ...product };
-
-    // @ts-ignore
-    _product[`${name}`] = val;
-
-    setProduct(_product);
+    // const val = e.value || 0;
+    // let _product = { ...product };
+    // // @ts-ignore
+    // _product[`${name}`] = val;
+    // setProduct(_product);
   };
 
   const leftToolbarTemplate = () => {
@@ -360,10 +479,10 @@ const MyLeads = () => {
     );
   };
 
-  const actionBodyTemplate = (rowData: Product) => {
+  const actionBodyTemplate = (rowData: Lead) => {
     return (
       <React.Fragment>
-        <Button
+        {/* <Button
           icon="pi pi-pencil"
           rounded
           outlined
@@ -371,7 +490,7 @@ const MyLeads = () => {
           onClick={() => editProduct(rowData)}
         >
           <EditIcon />
-        </Button>
+        </Button> */}
         <Button
           icon="pi pi-trash"
           rounded
@@ -407,7 +526,7 @@ const MyLeads = () => {
         return null;
     }
   };
-  const productDialogFooter = (
+  const leadtDialogFooter = (
     <React.Fragment>
       <Button
         label="Cancel"
@@ -482,6 +601,7 @@ const MyLeads = () => {
   const statusItemTemplate = (option: any) => {
     return <Tag value={option} severity={getSeverity(option)} />;
   };
+
   return (
     <>
       <div className="common-main-header">
@@ -489,10 +609,10 @@ const MyLeads = () => {
           <h2 className="h2">My Leads</h2>
         </div>
         <div className="right-btn-block">
-          <button className="theme_btn">
+          {/* <button className="theme_btn">
             <SendIcon /> Send to Agents
-          </button>
-          <button className="theme_btn balck_btn">
+          </button> */}
+          <button className="theme_btn balck_btn" onClick={handleDownload}>
             <ExportdataIcon />
             Export Data
           </button>
@@ -502,7 +622,7 @@ const MyLeads = () => {
         <DataTable
           className="datatable-main"
           ref={dt}
-          value={products}
+          value={getLeads}
           selection={selectedProducts}
           onSelectionChange={(e) => {
             if (Array.isArray(e.value)) {
@@ -523,48 +643,50 @@ const MyLeads = () => {
             className="select-tb"
           ></Column>
           <Column
-            field="code"
-            header="Code"
-            sortable
-            style={{ width: "5%" }}
-          ></Column>
-          <Column
-            field="name"
+            field="userId.name"
             header="Name"
             sortable
             style={{ width: "13%" }}
           ></Column>
           <Column
-            field="email"
+            field="userId.email"
             header="Email"
             className="emaildiv"
             style={{ width: "13%" }}
           ></Column>
           <Column
-            field="phone"
-            header="Phone"
+            field="userId.phone"
+            header="Phone No"
             style={{ width: "12%" }}
           ></Column>
-          <Column field="role" header="Role" style={{ width: "4%" }}></Column>
-          <Column field="city" header="City" style={{ width: "12%" }}></Column>
           <Column
-            field="borough"
+            field="leadType"
+            header="Lead Type"
+            style={{ width: "4%" }}
+          ></Column>
+          <Column
+            field="city"
+            header="City"
+            style={{ width: "12%" }}
+          ></Column>
+          <Column
+            field="boroughs"
             header="Borough"
             style={{ width: "16%" }}
           ></Column>
           <Column
-            field="property"
+            field="propertyType"
             header="Property"
             style={{ width: "12%" }}
           ></Column>
 
-          <Column
+          {/* <Column
             field="agent"
             header="Agent"
             sortable
             style={{ width: "10%" }}
-          ></Column>
-          <Column
+          ></Column> */}
+          {/* <Column
             field="inventoryStatus"
             header="Status"
             body={statusBodyTemplate}
@@ -572,7 +694,7 @@ const MyLeads = () => {
             filterMenuStyle={{ width: "14rem" }}
             filter
             filterElement={statusFilterTemplate}
-          ></Column>
+          ></Column> */}
           <Column
             header="Actions"
             body={actionBodyTemplate}
@@ -580,58 +702,72 @@ const MyLeads = () => {
             style={{ width: "3%" }}
           ></Column>
         </DataTable>
-        <Toolbar className="new-table-add" left={leftToolbarTemplate}></Toolbar>
+        {/* <Toolbar className="new-table-add" left={leftToolbarTemplate}></Toolbar> */}
       </section>
 
       <Dialog
-        visible={productDialog}
+        visible={leadDialog}
         style={{ width: "42rem" }}
         breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        header="Product Details"
+        header="Lead Details"
         modal
         className="edit-popup-user"
-        footer={productDialogFooter}
+        footer={leadtDialogFooter}
         onHide={hideDialog}
       >
         <div className="field-main">
           <div className="field">
             <label className="label-form" htmlFor="Role">
-              Role
+              Lead Type
             </label>
 
-            <Select className="select-main-wrap" options={options} />
-            {submitted && !product.name && (
+            <Select
+              className="select-main-wrap"
+              options={LEAD_TYPE}
+              value={LEAD_TYPE.find(
+                (option) => option.value === getLead?.leadType
+              )}
+              onChange={(e) => handleOnLeadTypeChange(e)}
+            />
+            {/* {submitted && !product.name && (
               <small className="p-error">Name is required.</small>
-            )}
+            )} */}
           </div>
           <div className="field">
             <label className="label-form" htmlFor="City">
               City
             </label>
 
-            <Select className="select-main-wrap" options={options} />
-            {submitted && !product.name && (
+            <Select
+              className="select-main-wrap"
+              options={city}
+              onChange={(e) => handleOnChangeLocation(e)}
+              onMenuOpen={handleMenuOpen}
+              onMenuClose={handleMenuClose}
+            />
+            {/* {submitted && !product.name && (
               <small className="p-error">Name is required.</small>
-            )}
+            )} */}
           </div>
           <div className="field">
             <label className="label-form" htmlFor="name">
-              Name
+              Borough
             </label>
-
-            <InputText
-              id="name"
-              value={product.name}
-              onChange={(e) => onInputChange(e, "name")}
-              required
-              autoFocus
-              className="form-control"
-            />
-            {submitted && !product.name && (
+            <Select className="select-main-wrap" options={getBoroughs} />
+            {/* {submitted && !product.name && (
               <small className="p-error">Name is required.</small>
-            )}
+            )}  */}
           </div>
-          <div className="field"></div>
+          <div className="field">
+            <label className="label-form" htmlFor="name">
+              Property Type
+            </label>
+            <Select className="select-main-wrap" options={PROPERTY_TYPE} />
+            {/* {submitted && !product.name && (
+              <small className="p-error">Name is required.</small>
+            )}  */}
+          </div>
+          {/* <div className="field"></div>
           <div className="field">
             <label className="label-form" htmlFor="name">
               Name
@@ -646,12 +782,12 @@ const MyLeads = () => {
                   <span>Remember</span>
                 </label>
               </li>
-            </ul>
+            </ul> */}
 
-            {submitted && !product.name && (
+          {/* {submitted && !product.name && (
               <small className="p-error">Name is required.</small>
-            )}
-          </div>
+            )} */}
+          {/* </div> */}
         </div>
       </Dialog>
 
