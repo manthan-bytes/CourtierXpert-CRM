@@ -27,6 +27,7 @@ import { CITIES } from "../../core/constants/cities";
 import { NEWCITIES } from "../../core/constants/listOfCities";
 import * as FileSaver from "file-saver";
 import * as XLSX from "sheetjs-style";
+
 interface Product {
   id: string | null;
   code: string;
@@ -602,6 +603,12 @@ const MyLeads = () => {
     return <Tag value={option} severity={getSeverity(option)} />;
   };
 
+
+  const customBodyTemplate = (rowData: { [x: string]: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }, column: { field: string | number; }) => {
+    // Customize the content of the cell here
+    return <span className="text-small-field">{rowData[column.field]}</span>;
+  };
+
   return (
     <>
       <div className="common-main-header">
@@ -667,8 +674,8 @@ const MyLeads = () => {
           <Column
             field="city"
             header="City"
-            style={{ width: "20%" }}
-
+            style={{ width: "15%" }}
+            body={customBodyTemplate}
           ></Column>
           <Column
             field="boroughs"

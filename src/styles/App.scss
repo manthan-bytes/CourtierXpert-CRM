@@ -291,6 +291,13 @@ img {
         @media screen and (max-width:$screen-xl-max) {
           padding: 1rem 0.5rem;
         }
+        .text-small-field {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+        }
 
         .p-tag {
           padding: 6px 7px;
