@@ -9,7 +9,6 @@ import {
   RightIcon,
 } from "../../core/icons";
 import { DataTable } from "primereact/datatable";
-import { Toast } from "primereact/toast";
 import { Column } from "primereact/column";
 import { Tag } from "primereact/tag";
 import { Button } from "primereact/button";
@@ -21,12 +20,14 @@ import { classNames } from "primereact/utils";
 import { Toolbar } from "primereact/toolbar";
 import Select from "react-select";
 import { Dropdown } from "primereact/dropdown";
-import { getAllLeads } from "../service/lead.service";
+import { deleteLead, getAllLeads } from "../service/lead.service";
 import { LEAD_TYPE, PROPERTY_TYPE } from "../../core/constants/constants";
 import { CITIES } from "../../core/constants/cities";
 import { NEWCITIES } from "../../core/constants/listOfCities";
 import * as FileSaver from "file-saver";
 import * as XLSX from "sheetjs-style";
+import { ToastContainer, toast } from "react-toastify";
+import { debug } from "console";
 
 interface Product {
   id: string | null;
@@ -202,7 +203,6 @@ const MyLeads = () => {
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [globalFilter, setGlobalFilter] = useState<string>("");
-  const toast = useRef<Toast>(null);
   const dt = useRef<DataTable<Product[]>>(null);
   const [locationOptions, setLocationOption] = useState<any>([]);
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -287,40 +287,47 @@ const MyLeads = () => {
 
   };
 
-  useEffect(() => {
+  const getAllLeadsApi = () => {
     const leadObj = {
       page: 1,
       limit: 10,
     };
-    const leads = getAllLeads(leadObj)
-      .then((res) => {
-        if (res.statusCode === 200) {
-          res.data.result.forEach((data:Lead) => {
-            const locations = JSON.parse(data.location);
-            let locationCity: any = [];
-          let locationBoroughs: any = [];
-          if (locations) {
-            locations.forEach((location: any) => {
-              const city = location.city;
-              const borough = location.boroughs;
-              locationCity.push(city);
-              locationBoroughs.push(borough);
-            });
-          }
-
-
-          data['city'] = locationCity.join(', ');
-
-          data['boroughs'] = locationBoroughs.join(', ');
-          })
-          console.log("🚀 ~ file: index.tsx:327 ~ .then ~ res.data.result:", res.data.result)
-          setLeads(res.data.result);
+   getAllLeads(leadObj).then((res:any) => {
+      if (res.statusCode === 200) {
+        res.data.result.forEach((data:Lead) => {
+          const locations = JSON.parse(data.location);
+          let locationCity: any = [];
+        let locationBoroughs: any = [];
+        if (locations) {
+          locations.forEach((location: any) => {
+            const city = location.city;
+            const borough = location.boroughs;
+            locationCity.push(city);
+            locationBoroughs.push(borough);
+          });
         }
-      })
-      .catch((err) => {
-        console.log("🚀 ~ file: index.tsx:179 ~ leads ~ err:", err);
-      });
+
+
+        data['city'] = locationCity.join(', ');
+
+        data['boroughs'] = locationBoroughs.join(', ');
+        })
+        console.log("🚀 ~ file: index.tsx:327 ~ .then ~ res.data.result:", res.data.result)
+        setLeads(res.data.result);
+      }
+    })
+    .catch((err:any) => {
+      console.log("🚀 ~ file: index.tsx:179 ~ leads ~ err:", err);
+    });
+  }
+
+  useEffect(() => {
+    getAllLeadsApi();
+   
   }, []);
+
+  useEffect(() => {
+  },[getLeads])
 
   const openNew = () => {
     setProduct(emptyProduct);
@@ -379,23 +386,28 @@ const MyLeads = () => {
 
   const confirmDeleteProduct = (product: Lead) => {
     setLead(product);
-    // setDeleteProductDialog(true);
+    setDeleteProductDialog(true);
   };
 
-  const deleteProduct = () => {
-    // let _products = products.filter(
-    //   (val: { id: string | null }) => val.id !== product.id
-    // );
+  const deleteProduct = async () => {
+    await deleteLead(getLead?.id).then((res) => {
+      debugger
+      if (res.statusCode === 200) {
+        getAllLeadsApi();
+        toast.success(res.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      } else {
+        toast.success(res.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      }
+    }).catch((err) => {
+      console.log("🚀 ~ awaitdeleteLead ~ err:", err)
+      
+    })
 
-    // setProducts(_products);
     setDeleteProductDialog(false);
-    setProduct(emptyProduct);
-    toast.current?.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "Product Deleted",
-      life: 3000,
-    });
   };
 
   const findIndexById = (id: string) => {
@@ -431,12 +443,7 @@ const MyLeads = () => {
     setProducts(_products);
     setDeleteProductsDialog(false);
     setSelectedProducts([]);
-    toast.current?.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "Products Deleted",
-      life: 3000,
-    });
+    
   };
 
   const onInputChange = (

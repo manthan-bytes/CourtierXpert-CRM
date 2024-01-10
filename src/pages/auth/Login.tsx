@@ -8,7 +8,7 @@ import "./Login.scss";
 import { RightIcon, EyehideIcon, EyeIcon } from "../../core/icons";
 import loginbg from "../../assets/images/login.jpg";
 import logoblack from "../../assets/images/logo-black.svg";
-import { login } from "../service/login.service";
+import { getUser, login } from "../service/login.service";
 import { ToastContainer, toast } from "react-toastify";
 
 const Login = () => {
@@ -28,8 +28,16 @@ const Login = () => {
     }
     await login({ email: username, password: password })
       .then((response: any) => {
+        debugger
         if (response.statusCode === 200) {
           localStorage.setItem("token", response.data.access_token);
+          getUser(username).then((userInfo) => {
+            localStorage.setItem("UserInfo",JSON.stringify(userInfo.data))
+
+          }).catch((error) => {
+            console.log("🚀 ~ userInfo ~ error:", error)
+            
+          });
           toast.success(response.message, {
             position: toast.POSITION.TOP_RIGHT,
           });
@@ -39,11 +47,13 @@ const Login = () => {
             position: toast.POSITION.TOP_RIGHT,
           });
         }
-        
+        element.classList.remove("loader-btn");
         // localStorage.setItem("token", response.data.data.access_token);
         // navigate("/dashboard");
       })
       .catch((err: any) => {
+        element.classList.remove("loader-btn");
+
         console.log("Login submit err", err);
       });
   };
@@ -109,21 +119,22 @@ const Login = () => {
                 <div className="form-bottom-bock">
                   <ul className="property-select">
                     <li>
-                      <label className="custom-checkbox">
+                      {/* <label className="custom-checkbox">
                         <input type="checkbox" name="pool" value="pool" />
                         <div className="checkbox-lable">
                           <RightIcon />
                         </div>
                         <span>Remember</span>
-                      </label>
+                      </label> */}
                     </li>
                   </ul>
-                  <Link className="btn-link" to="/dashboard">
+                  {/* <Link className="btn-link" to="/dashboard">
                     Forget Password?
-                  </Link>
+                  </Link> */}
                 </div>
               </div>
-              <div className="theme_btn grdnt_btn" onClick={submitHandler} id="submit">Login</div>
+           
+              <div className="theme_btn grdnt_btn" onClick={submitHandler} id="submit"> <span>Login</span></div>
               {/* <ButtonSubmit title="Login" disabled={false} /> */}
             </form>
           </div>

@@ -15,3 +15,19 @@ export async function getAllLeads(payload:any) {
       throw e;
     }
   }
+
+  export async function deleteLead(payload:any) {
+    try {
+      const response = await axios.delete(`lead/admin/deleteLead/`+ payload);
+      debugger
+      if (response && response.status === 200) {
+        return response.data;
+      } else {
+        throw response;
+      }
+    } catch (e) {
+    console.log("🚀 ~ deleteLead ~ e:", e)
+    //   console.log(e?.response?.data?.error || "Something went wrong!");
+      throw e;
+    }
+  }

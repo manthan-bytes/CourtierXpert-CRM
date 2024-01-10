@@ -242,7 +242,7 @@ const Users = () => {
 
   };
 
-  useEffect(() => {
+  const getUserAPI = () => {
     const leadObj = {
       page: 1,
       limit: 50,
@@ -257,6 +257,10 @@ const Users = () => {
       .catch((err) => {
         console.log("🚀 ~ file: index.tsx:179 ~ leads ~ err:", err);
       });
+  }
+
+  useEffect(() => {
+    getUserAPI();
   }, []);
 
   const openNew = () => {
@@ -315,28 +319,40 @@ const Users = () => {
 
   const confirmDeleteProduct = (lead: User) => {
     setUser(lead);
-    // setDeleteProductDialog(true);
+    setDeleteProductDialog(true);
   };
 
-  const deleteProduct = () => {
-    // let _products = products.filter(
-    //   (val: { id: string | null }) => val.id !== product.id
-    // );
+  const deleteProduct = async () => {
 
-    // setProducts(_products);
-    deleteUser(getUser?.id).then((res) => {
-    console.log("🚀 ~ file: index.tsx:328 ~ deleteUser ~ res:", res)
-    setDeleteProductDialog(false);
-    toast.success(res.message, {
-        position: toast.POSITION.TOP_RIGHT,
-      });
-      
+    await deleteUser(getUser?.id).then((res) => {
+      debugger
+      if (res.statusCode === 200) {
+        getUserAPI();
+        toast.success(res.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      } else {
+        toast.success(res.message, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      }
     }).catch((err) => {
-      toast.error(err.message, {
-        position: toast.POSITION.TOP_RIGHT,
-      });
+      console.log("🚀 ~ awaitdeleteLead ~ err:", err)
+      
     })
+
+    // deleteUser(getUser?.id).then((res) => {
    
+    // toast.success(res.message, {
+    //     position: toast.POSITION.TOP_RIGHT,
+    //   });
+      
+    // }).catch((err) => {
+    //   toast.error(err.message, {
+    //     position: toast.POSITION.TOP_RIGHT,
+    //   });
+    // })
+    setDeleteProductDialog(false);
     // setProduct(emptyProduct);
     // toast.current?.show({
     //   severity: "success",

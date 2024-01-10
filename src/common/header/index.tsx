@@ -11,6 +11,7 @@ const Header = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>();
   // Home burger menu
   const [isActive, setIsActive] = useState(false);
+  const [userInfo, setUserInfo] = useState<any>();
   const toggleClass = () => {
     setIsActive(!isActive);
   };
@@ -40,7 +41,25 @@ const Header = () => {
     }
   };
 
+  const handleItemClick = () => {
+    setIsActive(!isActive);
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    setIsActive(false);
+    navigate(ROUTES.LOGIN);
+    // Perform logout logic
+  };
+
   useEffect(() => {
+    const userInfo = localStorage.getItem("UserInfo");
+    
+    if (userInfo) {
+      setUserInfo(JSON.parse(userInfo));
+
+    }
+
     const handleScroll = () => {
       // Check the scroll position
       const scrollY = window.scrollY;
@@ -104,19 +123,19 @@ const Header = () => {
             </Link>
           </div>
           <div className="menu-block-right">
-            <div className="login-user-dateils">
+            <div className="login-user-dateils" onClick={handleItemClick}>
               <div className="user-icon-btn">
                 <img src={userimg} alt="user icon" width="48" height="48" />
               </div>
               <div className="use-name">
-                <strong>Ravi kushwah</strong>
+                <strong>{userInfo?.name}</strong>
                 <span>Admin</span>
               </div>
             </div>
-            <div className="active munu-block">
+            <div className={isActive ? 'active munu-block' : 'munu-block'}>
               <ul>
-                <li>
-                  <div className="menu-link">Logout</div>
+                <li onClick={handleLogout}>
+                  <div className="menu-link" >Logout</div>
                 </li>
               </ul>
             </div>

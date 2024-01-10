@@ -8,7 +8,7 @@ export async function login(payload:any) {
         console.log("🚀 ~ file: login.service.tsx:8 ~ login ~ response:", response)
         return response.data;
       } else {
-        throw response;
+        throw response.data;
       }
     } catch (e) {
     console.log("🚀 ~ file: login.service.tsx:12 ~ createUser ~ e:", e)
@@ -43,6 +43,21 @@ export async function login(payload:any) {
       }
     } catch (e) {
     console.log("🚀 ~ file: login.service.tsx:12 ~ createUser ~ e:", e)
+    //   console.log(e?.response?.data?.error || "Something went wrong!");
+      throw e;
+    }
+  }
+
+  export async function getUser(payload:any) {
+    try {
+      const response = await axios.get(`user/getUserByEmail/${payload}`);
+      if (response && response.status === 200) {
+        return response.data;
+      } else {
+        throw response;
+      }
+    } catch (e) {
+    console.log("🚀 ~ file: login.service.tsx:27 ~ getUser ~ e:", e)
     //   console.log(e?.response?.data?.error || "Something went wrong!");
       throw e;
     }
