@@ -19,7 +19,6 @@ export async function getAllLeads(payload:any) {
   export async function deleteLead(payload:any) {
     try {
       const response = await axios.delete(`lead/admin/deleteLead/`+ payload);
-      debugger
       if (response && response.status === 200) {
         return response.data;
       } else {

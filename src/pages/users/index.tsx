@@ -322,19 +322,22 @@ const Users = () => {
     setDeleteProductDialog(true);
   };
 
-  const deleteProduct = async () => {
+  const deleteProduct = async (id?: number,lastRecord?: Boolean) => {
 
-    await deleteUser(getUser?.id).then((res) => {
-      debugger
+    await deleteUser(id ? id : getUser?.id).then((res) => {
       if (res.statusCode === 200) {
         getUserAPI();
+        if (!id || lastRecord === true) {
         toast.success(res.message, {
           position: toast.POSITION.TOP_RIGHT,
         });
+      }
       } else {
+        if (!id || lastRecord === true) {
         toast.success(res.message, {
           position: toast.POSITION.TOP_RIGHT,
         });
+      }
       }
     }).catch((err) => {
       console.log("🚀 ~ awaitdeleteLead ~ err:", err)
@@ -509,7 +512,7 @@ const Users = () => {
         icon="pi pi-check"
         severity="danger"
         className="theme_btn balck_btn"
-        onClick={deleteProduct}
+        onClick={() => deleteProduct(getUser?.id, true)}
       />
     </React.Fragment>
   );
@@ -554,6 +557,27 @@ const Users = () => {
     return <Tag value={option} severity={getSeverity(option)} />;
   };
 
+  const handleSelectedValues = (selectedValues: any) => {
+    console.log("🚀 ~ handleSelectedValues ~ selectedValues:", selectedValues);
+
+    setSelectedProducts(selectedValues);
+
+   
+  };
+
+  const handleMultipalDelete = async () => {
+    await selectedProducts.forEach((lead: any, i:number) => {
+      if (i === selectedProducts.length - 1){
+        deleteProduct(lead?.id,true);
+
+      }
+      else{
+        deleteProduct(lead?.id,false);
+      }
+
+    });
+  }
+
   return (
     <>
       <div className="common-main-header">
@@ -561,8 +585,8 @@ const Users = () => {
           <h2 className="h2">My Leads</h2>
         </div>
         <div className="right-btn-block">
-          {/* <button className="theme_btn">
-            <SendIcon /> Send to Agents
+        {/* <button className="theme_btn" onClick={handleMultipalDelete}>
+             Delete
           </button> */}
           <button className="theme_btn balck_btn" onClick={handleDownload}>
             <ExportdataIcon />
@@ -578,7 +602,8 @@ const Users = () => {
           selection={selectedProducts}
           onSelectionChange={(e) => {
             if (Array.isArray(e.value)) {
-              setSelectedProducts(e.value);
+              // setSelectedProducts(e.value);
+              handleSelectedValues(e.value);
             }
           }}
           dataKey="id"

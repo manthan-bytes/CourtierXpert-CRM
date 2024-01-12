@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./header.scss";
 import logoblack from "../../assets/images/logo-black.svg";
-import userimg from "../../assets/images/userimg.png";
+import userimg from "../../assets/images/admin.jpg";
 import { ROUTES } from "../../core/constants/routes";
 
 const Header = () => {

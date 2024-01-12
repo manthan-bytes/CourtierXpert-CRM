@@ -17,7 +17,6 @@ export async function createLead(payload:any) {
   }
 
   export async function updateLead(id:number , payload:any) {
-    debugger
     console.log("🚀 ~ file: lead.service.tsx:20 ~ updateLead ~ payload:", payload)
     try {
       const response = await axios.put(`lead/update/${id}`, payload);
@@ -35,7 +34,6 @@ export async function createLead(payload:any) {
   }
 
   export async function updateImage(id:number , payload:any) {
-    debugger
     console.log("🚀 ~ file: lead.service.tsx:20 ~ updateLead ~ payload:", payload)
     try {
       const response = await axios.put(`lead/updateImage/${id}`, payload,

@@ -63,9 +63,9 @@ interface Lead {
     buildingType: string;
     isIntegration: "yes" | "no";
   };
-  location: any ; // Change this to the appropriate type if there's location information
-  city:any;
-  boroughs:any;
+  location: any; // Change this to the appropriate type if there's location information
+  city: any;
+  boroughs: any;
   createdAt: string;
   updatedAt: string;
   userId: {
@@ -249,7 +249,6 @@ const MyLeads = () => {
       let locationCity: any = [];
       let locationBoroughs: any = [];
       if (location) {
-
         location.forEach((location: any) => {
           const city = location.city;
           const borough = location.boroughs;
@@ -268,23 +267,22 @@ const MyLeads = () => {
         PropertySaleTime: element.propertySaleTime,
         PropertyPurchaseTime: element.propertyPurchaseTime,
         PropertyImages: element.propertyImage,
-        City: locationCity.join(', '), // Join multiple cities into a string
-        Boroughs: locationBoroughs.join(', '), // Join multiple boroughs into a string
+        City: locationCity.join(", "), // Join multiple cities into a string
+        Boroughs: locationBoroughs.join(", "), // Join multiple boroughs into a string
       };
       const preferences = element.preferences;
       const mergeObj = { ...obj, ...preferences };
 
       excelData.push(mergeObj);
     });
-   
+
     setTimeout(() => {
       const ws = XLSX.utils.json_to_sheet(excelData);
       const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
       const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
       const data = new Blob([excelBuffer], { type: fileType });
       FileSaver.saveAs(data, "test" + fileExtension);
-    },1000)
-
+    }, 1000);
   };
 
   const getAllLeadsApi = () => {
@@ -292,42 +290,43 @@ const MyLeads = () => {
       page: 1,
       limit: 10,
     };
-   getAllLeads(leadObj).then((res:any) => {
-      if (res.statusCode === 200) {
-        res.data.result.forEach((data:Lead) => {
-          const locations = JSON.parse(data.location);
-          let locationCity: any = [];
-        let locationBoroughs: any = [];
-        if (locations) {
-          locations.forEach((location: any) => {
-            const city = location.city;
-            const borough = location.boroughs;
-            locationCity.push(city);
-            locationBoroughs.push(borough);
+    getAllLeads(leadObj)
+      .then((res: any) => {
+        if (res.statusCode === 200) {
+          res.data.result.forEach((data: Lead) => {
+            const locations = JSON.parse(data.location);
+            let locationCity: any = [];
+            let locationBoroughs: any = [];
+            if (locations) {
+              locations.forEach((location: any) => {
+                const city = location.city;
+                const borough = location.boroughs;
+                locationCity.push(city);
+                locationBoroughs.push(borough);
+              });
+            }
+
+            data["city"] = locationCity.join(", ");
+
+            data["boroughs"] = locationBoroughs.join(", ");
           });
+          console.log(
+            "🚀 ~ file: index.tsx:327 ~ .then ~ res.data.result:",
+            res.data.result
+          );
+          setLeads(res.data.result);
         }
-
-
-        data['city'] = locationCity.join(', ');
-
-        data['boroughs'] = locationBoroughs.join(', ');
-        })
-        console.log("🚀 ~ file: index.tsx:327 ~ .then ~ res.data.result:", res.data.result)
-        setLeads(res.data.result);
-      }
-    })
-    .catch((err:any) => {
-      console.log("🚀 ~ file: index.tsx:179 ~ leads ~ err:", err);
-    });
-  }
+      })
+      .catch((err: any) => {
+        console.log("🚀 ~ file: index.tsx:179 ~ leads ~ err:", err);
+      });
+  };
 
   useEffect(() => {
     getAllLeadsApi();
-   
   }, []);
 
-  useEffect(() => {
-  },[getLeads])
+  useEffect(() => {}, [getLeads]);
 
   const openNew = () => {
     setProduct(emptyProduct);
@@ -385,27 +384,33 @@ const MyLeads = () => {
   };
 
   const confirmDeleteProduct = (product: Lead) => {
+    console.log(product);
+    
     setLead(product);
     setDeleteProductDialog(true);
   };
 
-  const deleteProduct = async () => {
-    await deleteLead(getLead?.id).then((res) => {
-      debugger
-      if (res.statusCode === 200) {
-        getAllLeadsApi();
-        toast.success(res.message, {
-          position: toast.POSITION.TOP_RIGHT,
-        });
-      } else {
-        toast.success(res.message, {
-          position: toast.POSITION.TOP_RIGHT,
-        });
-      }
-    }).catch((err) => {
-      console.log("🚀 ~ awaitdeleteLead ~ err:", err)
-      
-    })
+  const deleteProduct = async (id?: number,lastRecord?: Boolean) => {
+    await deleteLead(id ? id : getLead?.id)
+      .then((res) => {
+        if (res.statusCode === 200) {
+          getAllLeadsApi();
+          if (!id || lastRecord === true) {
+            toast.success(res.message, {
+              position: toast.POSITION.TOP_RIGHT,
+            });
+          }
+        } else {
+          if (!id || lastRecord === true) {
+            toast.error(res.message, {
+              position: toast.POSITION.TOP_RIGHT,
+            });
+          }
+        }
+      })
+      .catch((err) => {
+        console.log("🚀 ~ awaitdeleteLead ~ err:", err);
+      });
 
     setDeleteProductDialog(false);
   };
@@ -443,7 +448,6 @@ const MyLeads = () => {
     setProducts(_products);
     setDeleteProductsDialog(false);
     setSelectedProducts([]);
-    
   };
 
   const onInputChange = (
@@ -565,7 +569,7 @@ const MyLeads = () => {
         icon="pi pi-check"
         severity="danger"
         className="theme_btn balck_btn"
-        onClick={deleteProduct}
+        onClick={() => deleteProduct(getLead?.id, true)}
       />
     </React.Fragment>
   );
@@ -610,11 +614,44 @@ const MyLeads = () => {
     return <Tag value={option} severity={getSeverity(option)} />;
   };
 
-
-  const customBodyTemplate = (rowData: { [x: string]: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }, column: { field: string | number; }) => {
+  const customBodyTemplate = (
+    rowData: {
+      [x: string]:
+        | string
+        | number
+        | boolean
+        | React.ReactElement<any, string | React.JSXElementConstructor<any>>
+        | Iterable<React.ReactNode>
+        | React.ReactPortal
+        | null
+        | undefined;
+    },
+    column: { field: string | number }
+  ) => {
     // Customize the content of the cell here
     return <span className="text-small-field">{rowData[column.field]}</span>;
   };
+
+  const handleSelectedValues = (selectedValues: any) => {
+    console.log("🚀 ~ handleSelectedValues ~ selectedValues:", selectedValues);
+
+    setSelectedProducts(selectedValues);
+
+   
+  };
+
+  const handleMultipalDelete = async () => {
+    await selectedProducts.forEach((lead: any, i:number) => {
+      if (i === selectedProducts.length - 1){
+        deleteProduct(lead?.id,true);
+
+      }
+      else{
+        deleteProduct(lead?.id,false);
+      }
+
+    });
+  }
 
   return (
     <>
@@ -623,9 +660,9 @@ const MyLeads = () => {
           <h2 className="h2">My Leads</h2>
         </div>
         <div className="right-btn-block">
-          {/* <button className="theme_btn">
-            <SendIcon /> Send to Agents
-          </button> */}
+          <button className="theme_btn" onClick={handleMultipalDelete}>
+             Delete
+          </button>
           <button className="theme_btn balck_btn" onClick={handleDownload}>
             <ExportdataIcon />
             Export Data
@@ -640,7 +677,8 @@ const MyLeads = () => {
           selection={selectedProducts}
           onSelectionChange={(e) => {
             if (Array.isArray(e.value)) {
-              setSelectedProducts(e.value);
+              handleSelectedValues(e.value);
+              // setSelectedProducts(e.value);
             }
           }}
           dataKey="id"

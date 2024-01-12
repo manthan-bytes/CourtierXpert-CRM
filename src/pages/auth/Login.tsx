@@ -28,7 +28,6 @@ const Login = () => {
     }
     await login({ email: username, password: password })
       .then((response: any) => {
-        debugger
         if (response.statusCode === 200) {
           localStorage.setItem("token", response.data.access_token);
           getUser(username).then((userInfo) => {
